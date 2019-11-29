@@ -84,7 +84,7 @@ Window {
                 Button {
                     width: tableView.columnWidthProvider(index)
                     height: tableView.rowHeightProvider(index)
-                    text: tableModel.headerData(modelData, Qt.Horizontal)
+                    text: tableModel.headerData(index, Qt.Horizontal)
                 }
             }
         }
@@ -98,7 +98,7 @@ Window {
                 Button {
                     width: 30
                     height: tableView.rowHeightProvider(index)
-                    text: tableModel.headerData(modelData, Qt.Vertical)
+                    text: tableModel.headerData(index, Qt.Vertical)
                 }
             }
         }

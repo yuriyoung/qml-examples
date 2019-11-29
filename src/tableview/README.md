@@ -6,3 +6,11 @@
  
 * 截图
  ![demo](https://github.com/yuriyoung/qml-examples/blob/master/assets/img/tableview.jpg)
+ 
+ ## 功能
+ - 支持sqlite数据库
+ - 支持数据库迁移
+ - 支持数据库软删除
+ - 支持软删除恢复
+ - 支持行选择/删除选行
+ - 支持数据库/表切换

@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/migrations">
+        <file alias="001_books.sql">migrations/001_books.sql</file>
+        <file alias="002_publisher.sql">migrations/002_publisher.sql</file>
+    </qresource>
+</RCC>

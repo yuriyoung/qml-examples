@@ -49,6 +49,7 @@ Window {
                 verticalAlignment: Text.AlignVCenter
                 horizontalAlignment: Text.AlignLeft
                 padding: 4
+                clip: true
                 text: tableModel.data(tableModel.index(row, column))
             }
 

@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS publisher (
+	`id` INTEGER PRIMARY KEY AUTOINCREMENT,
+	`name` VARCHAR DEFAULT '',
+	`address` VARCHAR2 DEFAULT '',
+	`city` VARCHAR2(50),
+	`state` VARCHAR2(50),
+	`zip` VARCHAR2(50),
+);

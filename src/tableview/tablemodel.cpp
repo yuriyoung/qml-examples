@@ -31,6 +31,7 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QSqlIndex>
+#include <QDateTime>
 #include <QItemSelectionModel>
 #include <QLoggingCategory>
 
@@ -40,7 +41,6 @@ class TableModelPrivate
 {
     Q_DECLARE_PUBLIC(TableModel)
 public:
-
     QString databaseName;
     QString tableName;
     QString errorString;
@@ -49,7 +49,10 @@ public:
     TableModel *q_ptr = nullptr;
 };
 
-
+/**
+ * @brief TableModel::TableModel
+ * @param parent
+ */
 TableModel::TableModel(QObject *parent)
     : QSqlRelationalTableModel(parent, Sql::database())
     , d_ptr(new TableModelPrivate())
@@ -159,6 +162,57 @@ QVariant TableModel::data(const QModelIndex &index, int role) const
     int column = role - Qt::UserRole - 1;
     QModelIndex modelIndex = createIndex(index.row(), column);
     return QSqlRelationalTableModel::data(modelIndex, Qt::DisplayRole);
+}
+
+bool TableModel::removeRows(int row, int count, const QModelIndex &parent)
+{
+     Q_D(TableModel);
+    if (parent.isValid() || row < 0 || count <= 0)
+        return false;
+    else if (row + count > rowCount())
+        return false;
+    else if (!count)
+        return true;
+
+    bool success = false;
+    int softDeleteColumn = fieldIndex("deleted_at");
+    bool supportSoftDelete = softDeleteColumn != -1;
+    if(supportSoftDelete)
+    {
+        for (int idx = row + count - 1; idx >= row; --idx)
+        {
+            QString value = data(createIndex(row, softDeleteColumn)).toString();
+            QDateTime dt = QDateTime::fromString(value, Qt::ISODate);
+            if(dt.isValid())
+            {
+                // hard delete
+                success = QSqlTableModel::removeRows(idx, 1, parent);
+            }
+            else
+            {
+                // soft delete (just filling deleted_at field)
+                QString t = QDateTime::currentDateTime().toString(Qt::ISODate);
+                success = setData(createIndex(idx, softDeleteColumn), t, Qt::EditRole);
+            }
+
+            if(!success)
+            {
+                d->errorString =  "Something wrong happen " + this->lastError().text();
+                qWarning() << d->errorString;
+                emit error(d->errorString);
+                break;
+            }
+        }
+
+        if(success && editStrategy() == OnManualSubmit)
+            return submitAll();
+    }
+    else
+    {
+        success = QSqlTableModel::removeRows(row, count, parent);
+    }
+
+    return success;
 }
 
 void TableModel::setDatabaseName(const QString &fileName)

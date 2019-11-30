@@ -186,7 +186,7 @@ bool TableModel::removeRows(int row, int count, const QModelIndex &parent)
             if(dt.isValid())
             {
                 // hard delete
-                success = QSqlTableModel::removeRows(idx, 1, parent);
+                success = QSqlRelationalTableModel::removeRows(idx, 1, parent);
             }
             else
             {
@@ -209,7 +209,7 @@ bool TableModel::removeRows(int row, int count, const QModelIndex &parent)
     }
     else
     {
-        success = QSqlTableModel::removeRows(row, count, parent);
+        success = QSqlRelationalTableModel::removeRows(row, count, parent);
     }
 
     return success;

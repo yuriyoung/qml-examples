@@ -131,7 +131,7 @@ bool TableModel::setData(const QModelIndex &index, const QVariant &value, int ro
                     ? QItemSelectionModel::Select
                     : QItemSelectionModel::Deselect;
             d->selectionModel->select(index, flag);
-            emit selectedRowsChanged();
+            emit selectionChanged();
             emit dataChanged(index, index, {role});
             return true;
         }

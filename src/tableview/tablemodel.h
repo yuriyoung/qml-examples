@@ -35,7 +35,7 @@ class TableModel : public QSqlRelationalTableModel,  public QQmlParserStatus
     QScopedPointer<TableModelPrivate> d_ptr;
     Q_PROPERTY(QString database READ databaseName WRITE setDatabaseName NOTIFY databaseNameChanged)
     Q_PROPERTY(QString table READ tableName WRITE setTable NOTIFY tableChanged)
-    Q_PROPERTY(QString selectedRows READ selectedRows NOTIFY selectedRowsChanged)
+    Q_PROPERTY(QString selectedRows READ selectedRows NOTIFY selectionChanged)
     Q_PROPERTY(QString errorString READ errorString)
     Q_ENUMS(ItemStatus)
 public:
@@ -72,7 +72,7 @@ public:
 signals:
     void databaseNameChanged();
     void tableChanged();
-    void selectedRowsChanged();
+    void selectionChanged();
     void error(const QString &message);
 
 public slots:

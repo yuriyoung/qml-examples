@@ -78,7 +78,7 @@ void TableModel::componentComplete()
     Q_D(TableModel);
     qDebug(lcTableModel) << "TableModel::componentComplete";
 
-    // connect signals slot
+    // connect signals slots
 
     if(d->databaseName.isEmpty() && d->tableName.isEmpty())
     {

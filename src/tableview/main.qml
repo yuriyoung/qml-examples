@@ -9,6 +9,7 @@ Window {
     width: 1200
     height: 600
     title: qsTr("QML TableView example")
+
     onWidthChanged: {
         tableView.forceLayout()
     }
@@ -19,6 +20,8 @@ Window {
         columnSpacing: 0
         rowSpacing: 0
         clip: true
+        interactive: false
+
         leftMargin: vericalHeader.implicitWidth
         topMargin: horizontalHeader.implicitHeight
         rowHeightProvider: function (row) { return 32; }
@@ -31,6 +34,8 @@ Window {
 
         model: SqlTableModel {
             id: tableModel
+            database: "data.db"
+            table: "books"
         }
 
         delegate: Rectangle {
@@ -38,31 +43,35 @@ Window {
 
             implicitWidth: content.implicitHeight
             implicitHeight: 30
+
             Rectangle { anchors.left: parent.left; height: parent.height; width: 1; color: "#dddddd"}
             Rectangle { anchors.top: parent.top; width: parent.width; height: 1; color: "#dddddd"}
             Rectangle { anchors.right: parent.right; height: parent.height; width: 1; color: "#dddddd"; visible: model.column === tableView.columns -1 }
             Rectangle { anchors.bottom: parent.bottom; width: parent.width; height: 1; color: "#dddddd"; visible: model.row === tableView.rows - 1 }
 
-            Text {
+            TextEdit {
                 id: content
                 anchors.fill: parent
                 verticalAlignment: Text.AlignVCenter
                 horizontalAlignment: Text.AlignLeft
                 padding: 4
-                clip: true
                 text: tableModel.data(tableModel.index(row, column))
-            }
-
-            MouseArea{
-                anchors.fill: parent
-                hoverEnabled: true
-                onEntered: cellItem.color = "lightsteelblue"
-                onExited: cellItem.color = "#ffffff"
-                onClicked: {
-                    console.log("(", row, ",", column ,")", "[", cellItem.x, ",",cellItem.y, "]")
-                    console.log(tableModel.rowCount(), tableModel.columnCount())
+                selectByMouse: true
+                onEditingFinished: {
+                    tableModel.setData(tableModel.index(row, column), content.text)
                 }
             }
+
+//            MouseArea{
+//                anchors.fill: parent
+//                hoverEnabled: true
+//                onEntered: cellItem.color = "lightsteelblue"
+//                onExited: cellItem.color = "#ffffff"
+//                onClicked: {
+//                    console.log("(", row, ",", column ,")", "[", cellItem.x, ",",cellItem.y, "]")
+//                    console.log(tableModel.rowCount(), tableModel.columnCount())
+//                }
+//            }
         }
 
         Button {

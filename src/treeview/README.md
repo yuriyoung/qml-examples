@@ -14,6 +14,7 @@
 - 无限节点
 
 ## json examples
+> 子节点key不一定必须是"children"，可以是任意key名称。
 - tree node:
 	```json
 	{

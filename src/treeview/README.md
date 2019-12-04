@@ -20,21 +20,19 @@
 		"title": "parent 1",
 		"subtitle": "subtitle 1",
 		"expanded": false,
-		'custom': "value",
+		"custom": "value",
 		"children": [
 			{
 				"title": "parent 1",
 				"subtitle": "subtitle 1",
 				"expanded": false,
-				'custom': "value",
+				"custom": "value",
 				"children": [
-					{ ... },
-					{ ... },
-					...
+					{ },
+					{ },
 				]
 			},
-			{ ... },
-			...
+			{  },
 		]
 	}
 	```
@@ -46,36 +44,32 @@
 			"title": "parent 1",
 			"subtitle": "subtitle 1",
 			"expanded": false,
-			'custom': "value",
+			"custom": "value",
 			"children": [
-				{ ... },
-				{ ... },
-				...
+				{ },
+				{ },
 			]
 		},
 		{
 			"title": "parent 2",
 			"subtitle": "subtitle 2",
 			"expanded": false,
-			'custom': "value",
+			"custom": "value",
 			"children": [
-				{ ... },
-				{ ... },
-				...
+				{ },
+				{ },
 			]
 		}，
 		{
 			"title": "parent 3",
 			"subtitle": "subtitle 3",
 			"expanded": false,
-			'custom': "value",
+			"custom": "value",
 			"children": [
-				{ ... },
-				{ ... },
-				...
+				{ },
+				{ },
 			]
 		},
-		...
 	]
 	```
 ## TODO

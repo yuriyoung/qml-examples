@@ -1,6 +1,8 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 
+#include "sql.h"
+#include "migration.h"
 #include "tablemodel.h"
 
 int main(int argc, char *argv[])
@@ -8,6 +10,17 @@ int main(int argc, char *argv[])
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
     QGuiApplication app(argc, argv);
+
+    // create database and tables
+    {
+        QStringList files = { ":/migrations/001_books.sql" };
+        Migration migration(Sql::database(QCoreApplication::applicationDirPath() + "/data.db"));
+        if(!migration.run(files))
+        {
+            qWarning() << "Create migration table(s) failed in database"
+                                   << migration.connection().databaseName();
+        }
+    }
 
     qmlRegisterType<TableModel>("Macai.App", 1, 0, "SqlTableModel");
 

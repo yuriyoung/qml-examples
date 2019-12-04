@@ -39,14 +39,6 @@ static QThreadStorage<QSqlDatabase> databasePool;
 class Sql
 {
 public:
-    static QSqlDatabase memoryDatabase()
-    {
-        QSqlDatabase db = Sql::database(":memory:");
-        migrate(db, ":/migrations/001_books.sql");
-
-        return db;
-    }
-
     static QSqlDatabase database(const QString &databaseName = QString(), bool open = true)
     {
         QSqlDatabase db;
@@ -55,7 +47,8 @@ public:
         {
             QString connName = QUuid::createUuid().toString(QUuid::Id128);
             db = QSqlDatabase::addDatabase(DRIVER, connName);
-            db.setDatabaseName(databaseName);
+            if(!databaseName.isEmpty())
+                db.setDatabaseName(databaseName);
             if(open)
                 db = QSqlDatabase::database(connName, open);
             databasePool.setLocalData(db);
@@ -72,44 +65,10 @@ public:
         return QSqlDatabase::database(connectionName, true);
     }
 
-private:
-    // TODO: create Migration class
-    static QStringList resolveStatements(const QString &file)
+    static QSqlDatabase connection()
     {
-        QStringList statements;
-        QFile sqlFile(file);
-        if(!sqlFile.open(QIODevice::ReadOnly))
-        {
-            qCritical() << "Can not open file '" << file << "' " << sqlFile.errorString();
-            return statements;
-        }
-
-        const QString sql = sqlFile.readAll();//.replace("\n", "");
-        statements = sql.split(QRegExp(";"), QString::SkipEmptyParts);
-        if(statements.last() == "\n")
-            statements.removeLast();
-
-        sqlFile.close();
-
-        return statements;
-    }
-
-    static bool migrate(const QSqlDatabase &db, const QString &file)
-    {
-        const QStringList statements = resolveStatements(file);
-        foreach(const QString &cmd, statements)
-        {
-            db.exec(cmd);
-            if(db.lastError().type() != QSqlError::NoError)
-            {
-                qCritical() << "Migration up error '" << file << "' " << db.lastError().text();
-                qCritical() << cmd;
-
-                return false;
-            }
-        }
-
-        return true;
+        QString connectionName = QUuid::createUuid().toString(QUuid::Id128);
+        return QSqlDatabase::database(connectionName, true);
     }
 };
 

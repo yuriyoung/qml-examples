@@ -33,6 +33,7 @@
 #include <QSqlIndex>
 #include <QDateTime>
 #include <QItemSelectionModel>
+#include <QUrl>
 #include <QLoggingCategory>
 
 Q_LOGGING_CATEGORY(lcTableModel, "app.TableModel")
@@ -41,13 +42,30 @@ class TableModelPrivate
 {
     Q_DECLARE_PUBLIC(TableModel)
 public:
+
+    void handleDatanaseChanged();
+    void handleTableChanged();
+
     QString databaseName;
     QString tableName;
     QString errorString;
+    bool completed = false;
     QItemSelectionModel *selectionModel = nullptr;
     mutable QHash<int, QByteArray> roles;
     TableModel *q_ptr = nullptr;
 };
+
+void TableModelPrivate::handleDatanaseChanged()
+{
+    Q_Q(TableModel);
+    q->database().setDatabaseName(databaseName);
+    q->database().open();
+}
+
+void TableModelPrivate::handleTableChanged()
+{
+
+}
 
 /**
  * @brief TableModel::TableModel
@@ -77,22 +95,19 @@ void TableModel::componentComplete()
 {
     Q_D(TableModel);
     qDebug(lcTableModel) << "TableModel::componentComplete";
+    d->completed = true;
 
     // connect signals slots
+    // ...
 
-    if(d->databaseName.isEmpty() && d->tableName.isEmpty())
-    {
-        // use default database and table
-        Sql::memoryDatabase();
-        d->databaseName = ":memory:";
-        d->tableName = "books";
-    }
-
+    this->database().close();
     this->database().setDatabaseName(d->databaseName);
-    this->setTable(d->tableName);
+    this->database().open();
+    QSqlRelationalTableModel::setTable(d->tableName);
 
     qDebug() << "database:" << this->database().databaseName()
-             << ", table:"  << this->tableName();
+             << ", table:"  << this->tableName()
+             << ", connection name:"  << this->database().connectionName();
 
     this->select();
 }
@@ -221,10 +236,12 @@ void TableModel::setDatabaseName(const QString &fileName)
     if(!fileName.compare(d->databaseName, Qt::CaseInsensitive))
         return;
 
-    // TODO:
-    // reset model
-    // verify table exists
-    // load table record
+    if(d->completed)
+    {
+        this->database().close();
+        this->database().setDatabaseName(fileName);
+        this->database().open();
+    }
 
     d->databaseName = fileName;
     emit databaseNameChanged();
@@ -239,17 +256,17 @@ QString TableModel::databaseName() const
 void TableModel::setTable(const QString &tableName)
 {
     Q_D(TableModel);
-
     // remove whitespace from the start and the end
     const QString table = tableName.trimmed();
-
-    if(table.isEmpty() || !table.compare(this->tableName(), Qt::CaseInsensitive))
+    if(!table.compare(this->tableName(), Qt::CaseInsensitive))
         return;
 
-    d->tableName = table;
-    if(!d->databaseName.isEmpty())
+    if(this->database().isValid() && d->completed)
+    {
         QSqlRelationalTableModel::setTable(table);
+    }
 
+    d->tableName = table;
     emit tableChanged();
 }
 

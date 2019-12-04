@@ -153,11 +153,14 @@ void JsonTreeModel::setJson(const QVariant &value)
          doc = QJsonDocument::fromVariant(data);
     }
 
-    if(doc.isNull() || d->jsonDoc == doc)
+    if(doc.isNull())
     {
         qCritical() << "Cannot parse json.";
         return;
     }
+
+    if(d->jsonDoc == doc)
+        return;
 
     clear();
     d->jsonDoc = doc;
@@ -183,7 +186,11 @@ void JsonTreeModel::save()
 
     QJsonArray rootArray = jsonFromTree(QModelIndex());
     QJsonDocument doc = QJsonDocument(rootArray);
-    const QByteArray data = doc.toBinaryData();//.toJson(QJsonDocument::Indented);
+#ifdef QT_DEBUG
+    const QByteArray data = doc.toJson(QJsonDocument::Indented);
+#else
+    const QByteArray data = doc.toBinaryData();
+#endif
     QFile file(d->file);
     if(!file.open(QIODevice::WriteOnly))
     {

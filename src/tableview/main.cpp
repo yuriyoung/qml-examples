@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
     // create database and tables
     {
         QStringList files = { ":/migrations/001_books.sql" };
-        Migration migration(Sql::database(QCoreApplication::applicationDirPath() + "/data.db"));
+        Migration migration(Sql::database("data.db"));
         if(!migration.run(files))
         {
             qWarning() << "Create migration table(s) failed in database"

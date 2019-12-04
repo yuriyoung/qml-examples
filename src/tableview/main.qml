@@ -20,8 +20,8 @@ Window {
         columnSpacing: 0
         rowSpacing: 0
         clip: true
-        interactive: false
 
+        contentHeight: rowHeightProvider(0) * rows + rowHeightProvider(rows-1)
         leftMargin: vericalHeader.implicitWidth
         topMargin: horizontalHeader.implicitHeight
         rowHeightProvider: function (row) { return 32; }
@@ -29,8 +29,8 @@ Window {
             return Math.max(1, (tableView.width - leftMargin) / tableView.columns)
         }
 
-        ScrollIndicator.horizontal: ScrollIndicator { }
-        ScrollIndicator.vertical: ScrollIndicator { }
+        ScrollIndicator.horizontal: ScrollIndicator {}
+        ScrollIndicator.vertical: ScrollIndicator { active: true }
 
         model: SqlTableModel {
             id: tableModel
@@ -55,6 +55,7 @@ Window {
                 verticalAlignment: Text.AlignVCenter
                 horizontalAlignment: Text.AlignLeft
                 padding: 4
+                clip: true
                 text: tableModel.data(tableModel.index(row, column))
                 selectByMouse: true
                 onEditingFinished: {
@@ -108,6 +109,14 @@ Window {
                     width: 30
                     height: tableView.rowHeightProvider(index)
                     text: tableModel.headerData(index, Qt.Vertical)
+                }
+            }
+            Button {
+                width: 30
+                height: tableView.rowHeightProvider(0)
+                text: "+"
+                onClicked: {
+                    tableModel.add()
                 }
             }
         }

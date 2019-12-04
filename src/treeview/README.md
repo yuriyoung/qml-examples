@@ -2,7 +2,7 @@
 从Quick controls 2.0的ListView实现，从QAbstractItemModel实现树形结构。
 
 ## 截图
- ![screenhot](./assets/img/treeview.gif)
+ ![screenhot](https://github.com/yuriyoung/qml-examples/blob/master/assets/img/treeview.gif)
  
 ## 功能
 - 支持json文件

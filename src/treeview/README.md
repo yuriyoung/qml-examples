@@ -59,7 +59,7 @@
 				{ },
 				{ },
 			]
-		}，
+		},
 		{
 			"title": "parent 3",
 			"subtitle": "subtitle 3",

@@ -203,6 +203,7 @@ Migration::Migration(const QSqlDatabase &db)
     : d_ptr(new MigrationPrivate())
 {
     d_ptr->connection = db;
+    d_ptr->q_ptr = this;
 }
 
 Migration::~Migration()

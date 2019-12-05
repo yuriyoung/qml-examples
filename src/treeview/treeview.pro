@@ -16,7 +16,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         jsontreemodel.cpp \
         main.cpp \
-        treemodel.cpp
+        treemodel.cpp \
+        treemodelproxy.cpp
 
 RESOURCES += qml.qrc
 
@@ -34,4 +35,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 HEADERS += \
     jsontreemodel.h \
     treemodel.h \
-    treemodel_p.h
+    treemodel_p.h \
+    treemodelproxy.h

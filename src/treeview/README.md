@@ -38,7 +38,7 @@
 	}
 	```
 
-- json tree file:
+- json tree:
 	```json
 	[
 		{

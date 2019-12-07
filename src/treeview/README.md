@@ -15,6 +15,8 @@
 
 ## json examples
 > 子节点key不一定必须是"children"，可以是任意key名称。
+> 不要忘记在QML中调用时指定json文件(项目中有样例resources/tree.json)或json格式的字符串
+
 - tree node:
 	```json
 	{
@@ -75,7 +77,9 @@
 	```
 ## TODO
 - [x] UI实现
+	- [x] 显示数据
     - [ ] 增加
     - [ ] 编辑
     - [ ] 删除
 - [ ] 节点搜索
+- [ ] 水平滚动

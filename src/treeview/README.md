@@ -1,5 +1,5 @@
 ## Qt Quick 2.0 TreeView
-从Quick controls 2.0的ListView实现，从QAbstractItemModel实现树形结构。
+从Quick controls 2.0的ListView实现，从QAbstractItemModel实现树形结构。截图中的UI使用了Material风格，例子中使用的是默认样式，请自行修改qml UI组件样式。
 
 ## 截图
  ![screenhot](https://github.com/yuriyoung/qml-examples/blob/master/assets/img/treeview.gif)

@@ -25,8 +25,8 @@ Window {
         delegate: ItemDelegate {
             id: delegateItem
 
-            property var modelIndex: treeview.mapToIndex(index)
             // inernal properties
+            property var modelIndex: model["_TreeView_ModelIndex"]
             property bool expanded: model["_TreeView_ItemExpanded"]
             property bool hasChildren: model["_TreeView_HasChildren"]
             property int depth: model["_TreeView_ItemDepth"]

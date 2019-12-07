@@ -24,11 +24,17 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 
+#include "jsontreemodel.h"
+#include "treemodelproxy.h"
+
 int main(int argc, char *argv[])
 {
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
     QGuiApplication app(argc, argv);
+
+    qmlRegisterType<JsonTreeModel>("Macai.App", 1, 0, "JsonModel");
+    qmlRegisterType<TreeModelProxy>("Macai.App", 1, 0, "TreeModelProxy");
 
     QQmlApplicationEngine engine;
     const QUrl url(QStringLiteral("qrc:/qml/main.qml"));

@@ -1,5 +1,107 @@
 import QtQuick 2.0
+import QtQuick.Controls 2.0
+import QtQuick.Layouts 1.0
+
+import Macai.App 1.0
 
 Item {
     id: control
+
+    property var model: null
+    property alias view: listView
+    property alias delegate: listView.delegate
+    property alias currentIndex: listView.currentIndex
+
+    signal expanded(var index)
+    signal collapsed(var index)
+    signal activated(var index)
+    signal clicked(var index)
+    signal doubleClicked(var index)
+    signal pressAndHold(var index)
+
+    ListView {
+        id: listView
+
+        anchors.fill: parent
+        clip: true
+        currentIndex: -1
+        highlightMoveDuration: 400
+        highlight: Rectangle { color: "lightsteelblue"; opacity: 0.3 }
+        ScrollBar.vertical: ScrollBar { }
+        ScrollBar.horizontal: ScrollBar { }
+
+        model: TreeModelProxy {
+            id: modelProxy
+            onExpanded: control.expanded(index)
+            onCollapsed: control.collapsed(index)
+            model: control.model
+        }
+
+        add: Transition {
+            NumberAnimation  { from: -control.width; to: 0; properties: "x"; duration: 300; easing.type: Easing.OutQuad }
+        }
+        remove: Transition {
+            NumberAnimation { to: -control.width; property: "x"; duration: 300; easing.type: Easing.OutQuad }
+        }
+        displaced : Transition {
+            NumberAnimation  { properties: "x,y"; duration: 300; easing.type: Easing.OutQuad }
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            focus: true
+            parent: listView
+            propagateComposedEvents: true
+            preventStealing: false
+            z: -1
+            onClicked: {
+                var clickIndex = listView.indexAt(0, mouseY + listView.contentY);
+                listView.currentIndex = clickIndex;
+                mouse.accepted = false;
+            }
+        }
+    }
+
+    function mapToIndex(row) {
+        return modelProxy.indexOf(row);
+    }
+
+    function isExpanded(index) {
+        if (index.valid && index.model !== model) {
+            console.warn("TreeView.isExpanded: model and index mismatch")
+            return false
+        }
+        return modelProxy.isExpanded(index)
+    }
+
+    function collapse(index) {
+        if (index.valid && index.model !== model)
+            console.warn("TreeView.collapse: model and index mismatch")
+        else
+            modelProxy.collapse(index)
+    }
+
+    function expand(index) {
+        if (index.valid && index.model !== model)
+            console.warn("TreeView.expand: model and index mismatch")
+        else
+            modelProxy.expand(index)
+    }
+
+    function setData(index, value) {
+        modelProxy.setData(index, value);
+    }
+
+    function add(index) {
+        if (index.valid && index.model !== model) {
+            console.warn("TreeView.expand: model and index mismatch")
+            return null
+        }
+        else
+            return modelProxy.add(index)
+    }
+
+    function remove(row, count) {
+        return modelProxy.remove(row, count)
+    }
 }

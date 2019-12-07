@@ -19,6 +19,7 @@
 #define TREEMODELPROXY_H
 
 #include <QAbstractListModel>
+#include <QItemSelection>
 
 /**
  * Because we can't implement a TreeView component.so,instead of implement a proxy model
@@ -44,18 +45,54 @@ public:
     void setModel(QAbstractItemModel *model);
 //    void setModel(const QVariant &model); // forget it
 
+    const QModelIndex &rootIndex() const;
+    void setRootIndex(const QModelIndex &index);
+    void resetRootIndex();
+
+    int itemIndex(const QModelIndex &index) const;
+    int lastChildIndex(const QModelIndex &index);
+
+    void expandRow(int row);
+    void collapseRow(int row);
+    bool isExpanded(int row) const;
+
+    bool isVisible(const QModelIndex &index);
+    bool childrenVisible(const QModelIndex &index);
+    bool removeVisible(int startIndex, int endIndex, bool destroyed = true);
+
+    Q_INVOKABLE QItemSelection selectionRange(const QModelIndex &fromIndex, const QModelIndex &toIndex) const;
+    Q_INVOKABLE QModelIndex indexOf(int row) const;
+    Q_INVOKABLE bool isExpanded(const QModelIndex &index) const;
+    Q_INVOKABLE void clear();
+
 signals:
     void modelChanged();
     void expanded(const QModelIndex &index);
     void collapsed(const QModelIndex &index);
+    void rootIndexChanged();
 
 public slots:
     void expand(const QModelIndex &index);
     void collapse(const QModelIndex &index);
+    QModelIndex add(const QModelIndex &parent);
+    bool remove(int row, int count);
+
+private slots:
+    void modelHasBeenDestroyed();
+    void modelHasBeenReset();
+    void modelDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRigth, const QVector<int> &roles);
+    void modelLayoutAboutToBeChanged(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint);
+    void modelLayoutChanged(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint);
+    void modelRowsAboutToBeInserted(const QModelIndex & parent, int start, int end);
+    void modelRowsAboutToBeMoved(const QModelIndex & sourceParent, int sourceStart, int sourceEnd, const QModelIndex & destinationParent, int destinationRow);
+    void modelRowsAboutToBeRemoved(const QModelIndex & parent, int start, int end);
+    void modelRowsMoved(const QModelIndex & sourceParent, int sourceStart, int sourceEnd, const QModelIndex & destinationParent, int destinationRow);
+    void modelRowsInserted(const QModelIndex & parent, int start, int end);
+    void modelRowsRemoved(const QModelIndex & parent, int start, int end);
 
 protected:
     TreeModelProxy(TreeModelProxyPrivate &dd, QObject *parent = nullptr);
-    QScopedPointer<TreeModelProxyPrivate> const d_ptr;
+    QScopedPointer<TreeModelProxyPrivate> d_ptr;
 };
 
 #endif // TREEMODELPROXY_H

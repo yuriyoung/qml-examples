@@ -14,7 +14,6 @@
 - 无限节点
 
 ## json examples
-> 子节点key不一定必须是"children"，可以是任意key名称。
 > 不要忘记在QML中调用时指定json文件(项目中有样例resources/tree.json)或json格式的字符串
 
 - tree node:

@@ -154,12 +154,12 @@ QStringList MigrationPrivate::resolveStatements(const QString &file)
         return statements;
     }
 
-    const QString sql = sqlFile.readAll();//.replace("\n", "");
+    const QString sql = sqlFile.readAll().trimmed();
     sqlFile.close();
 
     statements = sql.split(QRegExp(";"), QString::SkipEmptyParts);
-    if(statements.last() == "\n")
-        statements.removeLast();
+//    if(statements.last() == "\n" || statements.last() == "\r\n")
+//        statements.removeLast();
 
     return statements;
 }

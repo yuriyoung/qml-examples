@@ -122,7 +122,6 @@ QVariant JsonTreeModel::json() const
 void JsonTreeModel::setJson(const QVariant &value)
 {
     Q_D(JsonTreeModel);
-    Q_UNUSED(value)
     QVariant data = value;
     if (data.userType() == qMetaTypeId<QJSValue>())
             data = data.value<QJSValue>().toVariant();

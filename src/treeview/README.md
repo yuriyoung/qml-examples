@@ -11,10 +11,11 @@
 - 支持本地json文件读取
 - 节点展开
 - 节点折叠
+- 支持展开折叠状态保存
 - 无限节点
 
 ## json examples
-> 不要忘记在QML中调用时指定json文件(项目中有样例resources/tree.json)或json格式的字符串
+> 不要忘记在QML中调用时指定json文件(项目中有样例```resources/tree.json```)或json格式的字符串
 
 - tree node:
 	```json

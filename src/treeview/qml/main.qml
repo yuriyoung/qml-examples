@@ -22,73 +22,47 @@ Window {
             id: jsonModel
             json: "file:./tree.json" // path to json file
         }
-        delegate: ItemDelegate {
+        delegate: TreeItem {
             id: delegateItem
 
-            // inernal properties
-            property var modelIndex: model["_TreeView_ModelIndex"]
-            property bool expanded: model["_TreeView_ItemExpanded"]
-            property bool hasChildren: model["_TreeView_HasChildren"]
-            property int depth: model["_TreeView_ItemDepth"]
-            property int indent: model["_TreeView_ItemDepth"] * 16 + spacing
+            text: model.title || model.display || ""
 
-            width: Math.max(parent.width, 180)
-
-            RowLayout {
-                anchors.fill: parent
-                spacing: 4
-                anchors.leftMargin: indent
-
-                Image {
-                    id: icon
-                    source: "qrc:/resources/arrow.png"
-                    Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                    visible: delegateItem.hasChildren
-                    rotation: delegateItem.expanded ? 90 : 0
-                    Behavior on rotation { NumberAnimation { duration: 200; easing.type: Easing.OutQuad } }
-                    MouseArea {
-                        id: branchIconArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        onEntered: icon.scale = 1.2
-                        onExited: icon.scale = 1
-                        onClicked: {
-                            if (treeview.isExpanded(modelIndex)) {
-                                treeview.collapse(modelIndex);
-                                model.expanded = false;
-                            } else {
-                                treeview.expand(modelIndex);
-                                model.expanded = true;
-                            }
-                        }
+            onEditClicked: {
+                treeview.currentIndex = index
+            }
+            onEditAccepted: {
+                if(model.title !== undefined) {
+                    if(text !== model.title) {
+                        model.title = text
+                    }
+                } else {
+                    if(text !== model.display) {
+                        model.display = text
                     }
                 }
-                Text {
-                    id: title
-                    text: model.title || model.display || ""
-                    maximumLineCount: 2
-                    horizontalAlignment: Text.AlignLeft | Text.AlignVCenter
-                    elide: Text.ElideRight
-                    Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                    Layout.fillWidth: true
-                }
             }
-
-            onDoubleClicked: {
-                if (treeview.isExpanded(modelIndex)) {
-                    treeview.collapse(modelIndex);
-                    model.expanded = false;
-                } else {
-                    treeview.expand(modelIndex);
-                    model.expanded = true;
-                }
+            onBranchIconClicked: {
+                treeview.toggleExpand(modelIndex)
+                model.expanded = !model.expanded
+                treeview.currentIndex = index
             }
             onClicked: {
                 treeview.currentIndex = index;
             }
+            onAddClicked: {
+                var i = treeview.add(modelIndex)
+                if(i.valid) {
+                    treeview.expand(modelIndex)
+                    treeview.currentIndex = index + 1
+                }
+            }
+            onRemoveClicked: {
+                var ok = treeview.remove(index, 1)
+                if(!ok) console.log("remove fail")
+            }
             Component.onCompleted: {
                 if(model.expanded)
-                    treeview.expand(modelIndex);
+                    treeview.expand(modelIndex)
             }
         } // ItemDelegate
     }

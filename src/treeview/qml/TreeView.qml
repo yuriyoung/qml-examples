@@ -46,20 +46,6 @@ Item {
         displaced : Transition {
             NumberAnimation  { properties: "x,y"; duration: 300; easing.type: Easing.OutQuad }
         }
-
-        MouseArea {
-            anchors.fill: parent
-            focus: true
-            parent: listView
-            propagateComposedEvents: true
-            preventStealing: false
-            z: -1
-            onClicked: {
-                var clickIndex = listView.indexAt(0, mouseY + listView.contentY);
-                listView.currentIndex = clickIndex;
-                mouse.accepted = false;
-            }
-        }
     }
 
     function mapToIndex(row) {
@@ -86,6 +72,18 @@ Item {
             console.warn("TreeView.expand: model and index mismatch")
         else
             modelProxy.expand(index)
+    }
+
+    function toggleExpand(index) {
+        if (index.valid && index.model !== model) {
+            console.warn("TreeView.expand: model and index mismatch")
+        }
+        else {
+            if(isExpanded(index))
+                collapse(index)
+            else
+                expand(index);
+        }
     }
 
     function setData(index, value) {

@@ -76,7 +76,7 @@ ItemDelegate {
         Item {
             id: actionsItem
             visible: children.length > 0
-            implicitWidth: children.length ? children[0].children.length * 32 : 32
+            implicitWidth: children.length ? children[0].children.length * 24 : 24
             Layout.minimumWidth: 32
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
@@ -88,7 +88,7 @@ ItemDelegate {
                 RoundButton {
                     id: buttonAdd
                     flat: !buttonAdd.hovered
-                    text: "+"
+                    text: "+" // todo: change to font icon
                     width: 24
                     height: 24
                     ToolTip.text: qsTr("Add")

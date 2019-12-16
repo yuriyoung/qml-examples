@@ -29,7 +29,7 @@ class Migration
     Q_DISABLE_COPY(Migration)
 public:
     explicit Migration();
-    Migration(const QSqlDatabase &db);
+    explicit Migration(const QSqlDatabase &db);
     virtual ~Migration();
 
     void setConnection(const QSqlDatabase &db);

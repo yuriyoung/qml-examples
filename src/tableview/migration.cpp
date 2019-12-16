@@ -254,7 +254,7 @@ bool Migration::run(const QStringList &files)
     if(d->files.isEmpty())
     {
         qWarning(lcMigration) << "Nothing to migrate.";
-        return false;
+        return true;
     }
 
     return this->runMigration(d->files.toList());
@@ -285,7 +285,7 @@ bool Migration::run(const QString &path)
     if(d->files.isEmpty())
     {
         qWarning(lcMigration) << "Nothing to migrate.";
-        return false;
+        return true;
     }
 
     return this->runMigration(d->files.toList());

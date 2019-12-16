@@ -168,7 +168,8 @@ TreeModel::TreeModel(QObject *parent)
     : QAbstractItemModel(parent)
     , d_ptr(new TreeModelPrivate())
 {
-
+    Q_D(TreeModel);
+    d->q_ptr = this;
 }
 
 TreeModel::TreeModel(TreeModelPrivate &dd, QObject *parent)

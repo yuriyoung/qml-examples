@@ -234,7 +234,7 @@ QJsonArray JsonTreeModel::jsonFromTree(const QModelIndex &parent)
                     node.insert(key, QJsonValue::fromVariant(value));
             }
             // save old children to parent
-            node.insert("children", children);
+            node.insert("children", children); // TODO: apply original child key (means user defined key)
             // append current node
             jarray.append(node);
         }

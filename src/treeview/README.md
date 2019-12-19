@@ -5,7 +5,7 @@
  ![screenhot](https://github.com/yuriyoung/qml-examples/blob/master/assets/img/treeview.gif)
  
 ## 功能
-- 支持json文件: qml中通过```model.<role>```方式访问json的key读写json的值。eg: 读```model.title```; 写```model.title="new title"```
+- 支持json文件: TreeView的代理delegate中通过```model.<role>```方式访问json的key读写json的值。eg: 读```model.title```; 写```model.title="new title"```
 - 支持节点编辑/增加/删除
 - 支持本地json文件保存
 - 支持本地json文件读取

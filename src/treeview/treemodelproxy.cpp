@@ -174,7 +174,7 @@ TreeModelProxy::TreeModelProxy(QObject *parent)
 }
 
 TreeModelProxy::TreeModelProxy(TreeModelProxyPrivate &dd, QObject *parent)
-    : QAbstractListModel(parent)
+    : QAbstractItemModel(parent)
     , d_ptr(&dd)
 {
     Q_D(TreeModelProxy);
@@ -266,24 +266,35 @@ bool TreeModelProxy::setData(const QModelIndex &index, const QVariant &value, in
     }
 }
 
-QAbstractItemModel *TreeModelProxy::model() const
+QModelIndex TreeModelProxy::index(int row, int column, const QModelIndex &parent) const
+{
+    return hasIndex(row, column, parent) ? createIndex(row, column) : QModelIndex();
+}
+
+QModelIndex TreeModelProxy::parent(const QModelIndex &child) const
+{
+    return QModelIndex();
+}
+
+QVariant TreeModelProxy::model() const
 {
     Q_D(const TreeModelProxy);
 
-    return d->model;// ? QVariant::fromValue(d->model) : d->modelVariant;
+    return QVariant::fromValue(d->model); //d->model ? QVariant::fromValue(d->model) : d->modelVariant;
 }
 
-void TreeModelProxy::setModel(QAbstractItemModel *model)
+void TreeModelProxy::setModel(const QVariant &model)
 {
     Q_D(TreeModelProxy);
-//    QVariant model = m;
-//    if (model.userType() == qMetaTypeId<QJSValue>())
-//        model = model.value<QJSValue>().toVariant();
 
-    if(!model)
+    QObject *object = qvariant_cast<QObject *>(QVariant::fromValue(model));
+    if(!object)
         return;
 
-    if (d->model == model)
+    if(!qobject_cast<QAbstractItemModel *>(object))
+        return;
+
+    if (d->model == object)
         return;
 
     struct SignalSlot {
@@ -329,7 +340,7 @@ void TreeModelProxy::setModel(QAbstractItemModel *model)
     clear();
     d->model = nullptr;
     delete oldModel;
-    d->model = model;
+    d->model = qobject_cast<QAbstractItemModel *>(object);
 
     if (d->model)
     {
@@ -452,7 +463,7 @@ void TreeModelProxy::expandRow(int row)
     item.expanded = true;
     d->expandedItems.insert(item.index);
     QVector<int> changedRole(1, TreeModelProxyPrivate::ExpandedRole);
-    emit dataChanged(index(row), index(row), changedRole);
+    emit dataChanged(index(row, 0), index(row, 0), changedRole);
 
     d->itemsToExpand.append(&item);
     d->expandPendingRows();
@@ -468,7 +479,7 @@ void TreeModelProxy::collapseRow(int row)
     item.expanded = false;
     d->expandedItems.remove(item.index);
     QVector<int> changedRole(1, TreeModelProxyPrivate::ExpandedRole);
-    emit dataChanged(index(row), index(row), changedRole);
+    emit dataChanged(index(row, 0), index(row, 0), changedRole);
     int childrenCount = d->model->rowCount(item.index);
     if ((item.index.flags() & Qt::ItemNeverHasChildren) || !d->model->hasChildren(item.index) || childrenCount == 0)
         return;
@@ -732,7 +743,7 @@ void TreeModelProxy::modelDataChanged(const QModelIndex &topLeft, const QModelIn
                 break;
             ++bottomIndex;
         }
-        emit dataChanged(index(topIndex), index(bottomIndex), roles);
+        emit dataChanged(index(topIndex, topLeft.column()), index(bottomIndex, topLeft.column()), roles);
 
         i += bottomIndex - topIndex;
         if (i == bottomRigth.row())
@@ -757,7 +768,7 @@ void TreeModelProxy::modelLayoutChanged(const QList<QPersistentModelIndex> &pare
     if (parents.isEmpty()) {
         d->items.clear();
         d->showTopLevels(false /*doInsertRows*/);
-        emit dataChanged(index(0), index(d->items.count() - 1));
+        emit dataChanged(index(0, 0), index(d->items.count() - 1, 0));
     }
 
     for (const QPersistentModelIndex &pmi : parents) {
@@ -770,7 +781,7 @@ void TreeModelProxy::modelLayoutChanged(const QList<QPersistentModelIndex> &pare
                     int lastRow = lastChildIndex(lmi);
                     removeVisible(row + 1, lastRow, false /*doRemoveRows*/);
                     d->showChildren(d->items.at(row), 0, rowCount - 1, false /*doInsertRows*/);
-                    emit dataChanged(index(row + 1), index(lastRow));
+                    emit dataChanged(index(row + 1, 0), index(lastRow, 0));
                 }
             }
         }
@@ -917,7 +928,7 @@ void TreeModelProxy::modelRowsInserted(const QModelIndex &parent, int start, int
     int parentRow = itemIndex(parent);
     if (parentRow >= 0)
     {
-        const QModelIndex& parentIndex = index(parentRow);
+        const QModelIndex& parentIndex = index(parentRow, 0);
         QVector<int> changedRole(1, TreeModelProxyPrivate::HasChildrenRole);
         emit dataChanged(parentIndex, parentIndex, changedRole);
         item = d->items.at(parentRow);
@@ -983,7 +994,7 @@ void TreeModelProxy::modelRowsRemoved(const QModelIndex &parent, int start, int 
     int parentRow = itemIndex(parent);
     if (parentRow >= 0)
     {
-        const QModelIndex& parentIndex = index(parentRow);
+        const QModelIndex& parentIndex = index(parentRow, 0);
         QVector<int> changedRole(1, TreeModelProxyPrivate::HasChildrenRole);
         emit dataChanged(parentIndex, parentIndex, changedRole);
     }

@@ -18,18 +18,19 @@
 #ifndef TREEMODELPROXY_H
 #define TREEMODELPROXY_H
 
-#include <QAbstractListModel>
+#include <QAbstractItemModel>
+#include <QSortFilterProxyModel>
 #include <QItemSelection>
 
 /**
  * Because we can't implement a TreeView component.so,instead of implement a proxy model
  */
 class TreeModelProxyPrivate;
-class TreeModelProxy : public QAbstractListModel
+class TreeModelProxy : public QAbstractItemModel
 {
     Q_OBJECT
     Q_DECLARE_PRIVATE(TreeModelProxy)
-    Q_PROPERTY(QAbstractItemModel *model READ model WRITE setModel NOTIFY modelChanged)
+    Q_PROPERTY(QVariant model READ model WRITE setModel NOTIFY modelChanged)
     Q_PROPERTY(QModelIndex rootIndex READ rootIndex WRITE setRootIndex RESET resetRootIndex NOTIFY rootIndexChanged)
 public:
     explicit TreeModelProxy(QObject *parent = nullptr);
@@ -38,12 +39,13 @@ public:
     virtual QHash<int, QByteArray> roleNames() const;
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
-    virtual QVariant data(const QModelIndex &index, int role) const;
+    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     virtual bool setData(const QModelIndex &index, const QVariant &value, int role);
+    QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
+    QModelIndex parent(const QModelIndex &child) const;
 
-    QAbstractItemModel *model() const;
-    void setModel(QAbstractItemModel *model);
-//    void setModel(const QVariant &model); // forget it
+    QVariant model() const;
+    void setModel(const QVariant &model);
 
     const QModelIndex &rootIndex() const;
     void setRootIndex(const QModelIndex &index);

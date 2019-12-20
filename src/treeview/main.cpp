@@ -23,6 +23,7 @@
  */
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
+#include <QSortFilterProxyModel>
 
 #include "jsontreemodel.h"
 #include "treemodelproxy.h"
@@ -35,6 +36,7 @@ int main(int argc, char *argv[])
 
     qmlRegisterType<JsonTreeModel>("Macai.App", 1, 0, "JsonModel");
     qmlRegisterType<TreeModelProxy>("Macai.App", 1, 0, "TreeModelProxy");
+    qmlRegisterType<QSortFilterProxyModel>("Macai.App", 1, 0, "SortFilterModel");
 
     QQmlApplicationEngine engine;
     const QUrl url(QStringLiteral("qrc:/qml/main.qml"));

@@ -2,7 +2,9 @@
 从Quick controls 2.0的ListView实现，从QAbstractItemModel实现树形结构。截图中的UI使用了Material风格，例子中使用的是默认样式，请自行修改qml UI组件样式。
 
 ## 截图
- ![screenhot](https://github.com/yuriyoung/qml-examples/blob/master/assets/img/treeview.gif)
+> expand/collapse/edit/add/remove/search
+
+ ![screenhot](https://github.com/yuriyoung/qml-examples/blob/master/assets/img/treeview_1.gif)
  
 ## 功能
 - 支持json文件: TreeView的代理delegate中通过```model.<role>```方式访问json的key读写json的值。eg: 读```model.title```; 写```model.title="new title"```
@@ -81,6 +83,7 @@
     - [x] 增加
     - [x] 编辑
     - [x] 删除
-- [ ] 节点搜索
+- [x] 节点搜索
+- [ ] 排序
 - [ ] 多列
 - [ ] 水平滚动

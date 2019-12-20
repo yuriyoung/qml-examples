@@ -18,6 +18,7 @@
 
 #include "treemodel.h"
 #include "treemodel_p.h"
+#include <QDebug>
 
 TreeItem::TreeItem(const QVector<QVariant> &data, TreeItem *parent)
 {
@@ -268,6 +269,16 @@ QModelIndex TreeModel::parent(const QModelIndex &index) const
         return QModelIndex();
 
     return createIndex(parentItem->row(), 0, parentItem);
+}
+
+bool TreeModel::hasChildren(const QModelIndex &parent) const
+{
+    Q_D(const TreeModel);
+    if(!parent.isValid())
+        return false;
+
+    TreeItem *parentItem = d->treeItemOf(parent);
+    return parentItem->hasChildren();
 }
 
 bool TreeModel::insertRows(int row, int count, const QModelIndex &parent)

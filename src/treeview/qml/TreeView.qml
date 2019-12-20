@@ -1,5 +1,5 @@
-import QtQuick 2.0
-import QtQuick.Controls 2.0
+import QtQuick 2.5
+import QtQuick.Controls 2.5
 import QtQuick.Layouts 1.0
 
 import Macai.App 1.0
@@ -22,19 +22,44 @@ Item {
     ListView {
         id: listView
 
+        property string searchText: ""
+
         anchors.fill: parent
         clip: true
         currentIndex: -1
         highlightMoveDuration: 400
         highlight: Rectangle { color: "lightsteelblue"; opacity: 0.3 }
-        ScrollBar.vertical: ScrollBar { }
+        ScrollBar.vertical: ScrollBar { id: verticalScrollbar }
         ScrollBar.horizontal: ScrollBar { }
+        headerPositioning: ListView.PullBackHeader
+
+        header: ToolBar {
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.leftMargin: 2
+            anchors.rightMargin: verticalScrollbar.width
+            implicitHeight: filterField.height
+            background: Rectangle { color: "red"; anchors.fill: parent }
+
+            TextField {
+                id: filterField
+                width: parent.width
+                onTextChanged: {
+                    listView.searchText = text;
+                    sortFilterModel.setFilterRegExp(text)
+                }
+            }
+        }
 
         model: TreeModelProxy {
             id: modelProxy
             onExpanded: control.expanded(index)
             onCollapsed: control.collapsed(index)
-            model: control.model
+            model: SortFilterModel {
+                id: sortFilterModel
+                recursiveFilteringEnabled: true
+                sourceModel: control.model
+            }
         }
 
         add: Transition {
@@ -53,37 +78,37 @@ Item {
     }
 
     function isExpanded(index) {
-        if (index.valid && index.model !== model) {
-            console.warn("TreeView.isExpanded: model and index mismatch")
-            return false
-        }
+//        if (index.valid && index.model !== model) {
+//            console.warn("TreeView.isExpanded: model and index mismatch")
+//            return false
+//        }
         return modelProxy.isExpanded(index)
     }
 
     function collapse(index) {
-        if (index.valid && index.model !== model)
-            console.warn("TreeView.collapse: model and index mismatch")
-        else
+//        if (index.valid && index.model !== model)
+//            console.warn("TreeView.collapse: model and index mismatch")
+//        else
             modelProxy.collapse(index)
     }
 
     function expand(index) {
-        if (index.valid && index.model !== model)
-            console.warn("TreeView.expand: model and index mismatch")
-        else
+//        if (index.valid && index.model !== model)
+//            console.warn("TreeView.expand: model and index mismatch")
+//        else
             modelProxy.expand(index)
     }
 
     function toggleExpand(index) {
-        if (index.valid && index.model !== model) {
-            console.warn("TreeView.expand: model and index mismatch")
-        }
-        else {
+//        if (index.valid && index.model !== model) {
+//            console.warn("TreeView.expand: model and index mismatch")
+//        }
+//        else {
             if(isExpanded(index))
                 collapse(index)
             else
                 expand(index);
-        }
+//        }
     }
 
     function setData(index, value) {
@@ -91,11 +116,11 @@ Item {
     }
 
     function add(index) {
-        if (index.valid && index.model !== model) {
-            console.warn("TreeView.expand: model and index mismatch")
-            return null
-        }
-        else
+//        if (index.valid && index.model !== model) {
+//            console.warn("TreeView.expand: model and index mismatch")
+//            return null
+//        }
+//        else
             return modelProxy.add(index)
     }
 

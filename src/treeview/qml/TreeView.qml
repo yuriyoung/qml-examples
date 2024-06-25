@@ -38,15 +38,17 @@ Item {
             anchors.right: parent.right
             anchors.leftMargin: 2
             anchors.rightMargin: verticalScrollbar.width
-            implicitHeight: filterField.height
+            implicitHeight: filterField.height < minimumHeight ? minimumHeight : filterField.height
             background: Rectangle { color: "red"; anchors.fill: parent }
 
             TextField {
                 id: filterField
                 width: parent.width
+                implicitHeight: 30
                 onTextChanged: {
                     listView.searchText = text;
-                    sortFilterModel.setFilterRegExp(text)
+                    // sortFilterModel.setFilterRegExp(text) qt5
+                    // sortFilterModel.setFilterRegularExpression(text) qt6
                 }
             }
         }

@@ -36,9 +36,8 @@
 const QString DRIVER = "QSQLITE";
 static QThreadStorage<QSqlDatabase> databasePool;
 
-class Sql
+namespace Sql
 {
-public:
     static QSqlDatabase database(const QString &databaseName = QString(), bool open = true)
     {
         QSqlDatabase db;
@@ -70,6 +69,6 @@ public:
         QString connectionName = QUuid::createUuid().toString(QUuid::Id128);
         return QSqlDatabase::database(connectionName, true);
     }
-};
+} // namespace Sql
 
 #endif // SQL_H

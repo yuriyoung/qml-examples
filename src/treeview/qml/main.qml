@@ -20,7 +20,7 @@ Window {
 
         model: JsonModel {
             id: jsonModel
-            json: "file:./tree.json" // path to json file
+            json: "qrc:/resources/tree.json" // path to json file
         }
         delegate: TreeItem {
             id: delegateItem

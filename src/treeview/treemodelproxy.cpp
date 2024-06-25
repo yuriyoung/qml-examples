@@ -226,6 +226,8 @@ QVariant TreeModelProxy::data(const QModelIndex &index, int role) const
         return QVariant();
 
     const QModelIndex &modelIndex = d->mapToModel(index);
+    if(!modelIndex.isValid())
+        return QVariant();
 
     switch (role)
     {
@@ -234,7 +236,8 @@ QVariant TreeModelProxy::data(const QModelIndex &index, int role) const
     case TreeModelProxyPrivate::ExpandedRole:
         return isExpanded(index.row());
     case TreeModelProxyPrivate::HasChildrenRole:
-        return !(modelIndex.flags() & Qt::ItemNeverHasChildren) && d->model->hasChildren(modelIndex);
+        return d->model->hasChildren(modelIndex);
+        // return (modelIndex.flags() & Qt::ItemNeverHasChildren) && d->model->hasChildren(modelIndex);
     case TreeModelProxyPrivate::HasSiblingRole:
         return modelIndex.row() != d->model->rowCount(modelIndex.parent()) - 1;
     case TreeModelProxyPrivate::ModelIndexRole:
@@ -579,7 +582,7 @@ QItemSelection TreeModelProxy::selectionRange(const QModelIndex &fromIndex, cons
 
     QItemSelection sel;
     sel.reserve(ranges.count());
-    for (const MIPair &pair : qAsConst(ranges))
+    for (const MIPair &pair : std::as_const(ranges))
        sel.append(QItemSelectionRange(pair.first, pair.second));
 
     return sel;
@@ -856,7 +859,7 @@ void TreeModelProxy::modelRowsAboutToBeMoved(const QModelIndex &sourceParent, in
         {
             for (int i = endIndex + 1; i < destIndex; i++)
             {
-                d->items.swap(i, i - totalMovedCount); // Fast move from 1st to 2nd position
+                d->items.move(i, i - totalMovedCount); // Fast move from 1st to 2nd position
             }
             bufferCopyOffset = destIndex - totalMovedCount;
         }
@@ -865,7 +868,7 @@ void TreeModelProxy::modelRowsAboutToBeMoved(const QModelIndex &sourceParent, in
             // NOTE: we will not enter this loop if startIndex == destIndex
             for (int i = startIndex - 1; i >= destIndex; i--)
             {
-                d->items.swap(i, i + totalMovedCount); // Fast move from 1st to 2nd position
+                d->items.move(i, i + totalMovedCount); // Fast move from 1st to 2nd position
             }
             bufferCopyOffset = destIndex;
         }

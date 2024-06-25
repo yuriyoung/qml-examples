@@ -36,6 +36,12 @@
 #include <QSqlError>
 #include <QLoggingCategory>
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+#include <QRegExp>
+#else
+#include <QRegularExpression>
+#endif
+
 Q_LOGGING_CATEGORY(lcMigration, "app.Migration")
 
 class MigrationPrivate
@@ -157,7 +163,13 @@ QStringList MigrationPrivate::resolveStatements(const QString &file)
     const QString sql = sqlFile.readAll().trimmed();
     sqlFile.close();
 
-    statements = sql.split(QRegExp(";"), QString::SkipEmptyParts);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    static QRegExp re(";");
+    statements = sql.split(re, QString::SkipEmptyParts);
+#else
+    static QRegularExpression re(";");
+    statements = sql.split(re, Qt::SkipEmptyParts);
+#endif
 //    if(statements.last() == "\n" || statements.last() == "\r\n")
 //        statements.removeLast();
 
@@ -227,7 +239,11 @@ QSqlDatabase Migration::connection() const
 QStringList Migration::files() const
 {
     Q_D(const Migration);
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
     return d->files.toList();
+#else
+    return d->files.values();
+#endif
 }
 
 /**
@@ -257,7 +273,11 @@ bool Migration::run(const QStringList &files)
         return true;
     }
 
-    return this->runMigration(d->files.toList());
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
+    return d->files.toList();
+#else
+    return this->runMigration(d->files.values());
+#endif
 }
 
 /**
@@ -287,8 +307,11 @@ bool Migration::run(const QString &path)
         qWarning(lcMigration) << "Nothing to migrate.";
         return true;
     }
-
-    return this->runMigration(d->files.toList());
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
+    return d->files.toList();
+#else
+    return this->runMigration(d->files.values());
+#endif
 }
 
 /**
@@ -358,10 +381,12 @@ bool Migration::migrateUp(const QString &file)
 
     if(transacted)
         d->connection.transaction();
+
+    QSqlQuery query(d->connection);
     foreach(const QString &cmd, statements)
     {
-        d->connection.exec(cmd);
-        if(d->connection.lastError().type() != QSqlError::NoError)
+        query.exec(cmd);
+        if(query.lastError().type() != QSqlError::NoError)
         {
             qCritical(lcMigration) << "Migration up error '" << file << "' " << d->connection.lastError().text();
             qCritical(lcMigration) << cmd;
@@ -387,7 +412,7 @@ bool Migration::migrateDown(const QString &file)
     QString tableName = d->resolveInstance(file);
 
     bool transacted = d->connection.driver()->hasFeature(QSqlDriver::Transactions);
-    QStringList tables = d->connection.tables();
+    // QStringList tables = d->connection.tables();
 
     if(transacted)
     {
@@ -396,7 +421,8 @@ bool Migration::migrateDown(const QString &file)
 //    foreach(const QString &table, tables)
 //    {
     const QString cmd = QString("DROP TABLE %1").arg(tableName);
-    d->connection.exec(cmd);
+    QSqlQuery query(d->connection);
+    query.exec(cmd);
     if(d->connection.lastError().type() != QSqlError::NoError)
     {
         qCritical(lcMigration) << "Migration down error" << d->connection.lastError().text();
@@ -521,7 +547,8 @@ bool Migration::createRepository()
     Q_D(Migration);
     if(!this->repositoryExists())
     {
-        d->connection.exec(QString("CREATE TABLE %1 ("
+        QSqlQuery query(d->connection);
+        query.exec(QString("CREATE TABLE %1 ("
                            "id INTEGER PRIMARY KEY AUTOINCREMENT,"
                            "migration VARCHAR(255) NOT NULL DEFAULT '',"
                            "batch INTEGER NOT NULL DEFAULT 1)").arg(table()));

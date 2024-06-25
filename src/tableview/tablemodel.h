@@ -31,11 +31,12 @@ class TableModelPrivate;
 class TableModel : public QSqlRelationalTableModel,  public QQmlParserStatus
 {
     Q_OBJECT
+    Q_INTERFACES(QQmlParserStatus)
     Q_DECLARE_PRIVATE(TableModel)
     QScopedPointer<TableModelPrivate> d_ptr;
     Q_PROPERTY(QString database READ databaseName WRITE setDatabaseName NOTIFY databaseNameChanged)
     Q_PROPERTY(QString table READ tableName WRITE setTable NOTIFY tableChanged)
-    Q_PROPERTY(QString selectedRows READ selectedRows NOTIFY selectionChanged)
+    Q_PROPERTY(int selectedRows READ selectedRows NOTIFY selectionChanged)
     Q_PROPERTY(QString errorString READ errorString)
     Q_ENUMS(ItemStatus)
 public:

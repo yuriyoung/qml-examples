@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>resources/arrow.png</file>
+        <file>resources/tree.json</file>
     </qresource>
 </RCC>

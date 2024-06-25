@@ -27,6 +27,29 @@
 #include <QJSValue>
 #include <QDebug>
 
+namespace {
+
+QString urlToLocalFileOrQrc(const QUrl &url)
+{
+    const QString scheme(url.scheme().toLower());
+    if (scheme == QLatin1String("qrc")) {
+        if (url.authority().isEmpty())
+            return QLatin1Char(':') + url.path();
+        return QString();
+    }
+
+#if defined(Q_OS_ANDROID)
+    if (scheme == QLatin1String("assets")) {
+        if (url.authority().isEmpty())
+            return url.toString();
+        return QString();
+    }
+#endif
+    return url.toLocalFile();
+}
+
+}
+
 class JsonTreeModelPrivate : public TreeModelPrivate
 {
 public:
@@ -127,12 +150,13 @@ void JsonTreeModel::setJson(const QVariant &value)
             data = data.value<QJSValue>().toVariant();
 
     QJsonDocument doc;
-    if(data.canConvert(QVariant::Url))
+    if(data.canConvert<QUrl>())
     {
         QUrl url = data.toUrl();
-        if(url.isLocalFile())
+        const auto file = urlToLocalFileOrQrc(url);
+        if(!file.isEmpty())
         {
-            d->file = url.toLocalFile();
+            d->file = file;
             QFile file(d->file);
             if(!file.open(QIODevice::ReadOnly))
             {
@@ -140,9 +164,7 @@ void JsonTreeModel::setJson(const QVariant &value)
                 return;
             }
             QByteArray json = file.readAll();
-            doc = QJsonDocument::fromBinaryData(json);
-            if(doc.isNull())
-                doc = QJsonDocument::fromJson(json);
+            doc = QJsonDocument::fromJson(json);
 
             file.close();
         }
@@ -166,7 +188,11 @@ void JsonTreeModel::setJson(const QVariant &value)
 
     // dynamic role name for roleNames
     parseKeys(doc);
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
     setRoleNames(d->keys.toList());
+#else
+    setRoleNames(d->keys.values());
+#endif
     if(d->keys.size() > columnCount())
         this->insertColumns(columnCount(), d->keys.size() - columnCount());
 
